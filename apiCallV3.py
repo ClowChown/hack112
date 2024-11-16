@@ -50,7 +50,7 @@ def callRecipe(query):
     base_url = 'https://api.spoonacular.com/recipes/complexSearch'
     ingredients_url = 'https://api.spoonacular.com/recipes/{}/ingredientWidget.json'
     recipe_info_url = 'https://api.spoonacular.com/recipes/{}/information'
-    api_key = 'e912d57b81fd4b0983f8c1b4ee3aad2f'
+    api_key = '9f792a9d0c134949af1e8d1792ecf8bb'
 
     # Search query parameters
     query_params = {
@@ -58,6 +58,7 @@ def callRecipe(query):
         'query': query,
         'number':5,
         'ignorePantry':True,
+        'ranking':1,
         'apiKey': api_key
     }
 
@@ -96,4 +97,4 @@ def callRecipe(query):
         return final_recipe
 
 
-print(callRecipe({'chocolate_chips','banana'}))
+print(callRecipe('chicken,corn'))
