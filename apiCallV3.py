@@ -13,9 +13,13 @@ class Recipe:
         self.ingredients = ingredients
     
     def __repr__(self):
-        return (f'{self.name}: {self.servings} servings, ' +
-               f'{self.prepTime} mins of prep time, ' 
-               f'and ingredients: {self.ingredients}')
+        if self.servings == 1:
+            servingMessage = 'serving'
+        else:
+            servingMessage = 'servings'
+        return (f'{self.name}: {self.servings} {servingMessage} and ' +
+               f'{self.prepTime} mins of prep time ' 
+               f'with ingredients: {self.ingredients}')
 
 class Ingredient:
     def __init__(self, name, metric, amount):
@@ -24,10 +28,25 @@ class Ingredient:
         self.amount = amount
 
     def __repr__(self):
-        return f'{self.amount} {self.metric} of {self.name}'
+        if self.metric == '':
+            message = f'{self.amount} {self.name}'
+            if self.amount == 1 and message[-1] == 's':
+                message[:-1]
+            elif self.amount != 1 and message[-1] != 's':
+                message += 's'
+            return message
+        else:
+            if self.amount == 1 and self.metric[-1] == 's':
+                metric = self.metric[:-1]
+            elif self.amount != 1 and self.metric[-1] != 's':
+                metric = self.metric + 's'
+            else:
+                metric = self.metric
+            return f'{self.amount} {metric} of {self.name}'
 
 # Query --> a list of arguments passed in by the user via button clicks
 def callRecipe(query): 
+
     base_url = 'https://api.spoonacular.com/recipes/complexSearch'
     ingredients_url = 'https://api.spoonacular.com/recipes/{}/ingredientWidget.json'
     recipe_info_url = 'https://api.spoonacular.com/recipes/{}/information'
@@ -38,6 +57,7 @@ def callRecipe(query):
         # remember that query is a set
         'query': query,
         'number':5,
+        'ignorePantry':True,
         'apiKey': api_key
     }
 
@@ -49,10 +69,6 @@ def callRecipe(query):
     # Loop through the recipes
     recipes = data['results']
     for recipe in recipes:
-        # Print the title of the recipe
-        # print("Title:", recipe['title'])
-
-        # Get recipe ID
         recipe_id = recipe['id']
         
         # Fetch detailed recipe information (e.g., servings, prep time)
@@ -64,11 +80,6 @@ def callRecipe(query):
         recipe_name = recipe_info_data['title']
         recipe_servings = recipe_info_data['servings']
         recipe_prep_time = (recipe_info_data['readyInMinutes'], "minutes")
-        
-
-        # print("Additional Information:")
-        # print("Servings:", recipe_info_data['servings'])
-        # print("Preparation Time:", recipe_info_data['readyInMinutes'], "minutes")
 
         # Fetch ingredients for the recipe from the ingredientWidget endpoint
         ingredients_response = requests.get(ingredients_url.format(recipe_id), params={'apiKey': api_key})
@@ -85,4 +96,4 @@ def callRecipe(query):
         return final_recipe
 
 
-print(callRecipe({'apple','banana'}))
+print(callRecipe({'chocolate_chips','banana'}))
